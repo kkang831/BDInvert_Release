@@ -489,7 +489,8 @@ class SynthesisModule(nn.Module):
         """Gets number of feature maps according to current resolution."""
         return min(self.fmaps_base // res, self.fmaps_max)
 
-    def forward(self, wp, randomize_noise=False):
+    def forward(self, wp, randomize_noise=False,
+                basecode_layer=None, basecode=None):
         if wp.ndim != 3 or wp.shape[1:] != (self.num_layers, self.w_space_dim):
             raise ValueError(f'Input tensor should be with shape '
                              f'[batch_size, num_layers, w_space_dim], where '
@@ -509,17 +510,24 @@ class SynthesisModule(nn.Module):
             results[f'output_style{layer_idx // 2}'] = style
         elif self.architecture == 'skip':
             for layer_idx in range(self.num_layers - 1):
-                x, style = self.__getattr__(f'layer{layer_idx}')(
-                    x, wp[:, layer_idx], randomize_noise)
+                x, style = self.__getattr__(f'layer{layer_idx}')(x, wp[:, layer_idx], randomize_noise)
+                results[f'x{layer_idx:02d}'] = x
                 results[f'style{layer_idx:02d}'] = style
+
+                if basecode_layer == f'x{layer_idx:02d}':
+                    x = basecode.contiguous()
+
                 if layer_idx % 2 == 0:
-                    temp, style = self.__getattr__(f'output{layer_idx // 2}')(
-                        x, wp[:, layer_idx + 1])
+                    temp, style = self.__getattr__(f'output{layer_idx // 2}')(x, wp[:, layer_idx + 1])
                     results[f'output_style{layer_idx // 2}'] = style
                     if layer_idx == 0:
                         image = temp
                     else:
-                        image = temp + self.upsample(image)
+                        if basecode_layer == f'x{layer_idx-1:02d}':
+                            image = temp
+                        else:
+                            image = temp + self.upsample(image)
+
         elif self.architecture == 'resnet':
             x, style = self.layer0(x)
             results[f'style00'] = style

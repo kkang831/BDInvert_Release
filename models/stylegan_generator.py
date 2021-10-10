@@ -467,7 +467,8 @@ class SynthesisModule(nn.Module):
         """Gets number of feature maps according to current resolution."""
         return min(self.fmaps_base // res, self.fmaps_max)
 
-    def forward(self, wp, lod=None, randomize_noise=False):
+    def forward(self, wp, lod=None, randomize_noise=False,
+    			basecode_layer=None, basecode=None):
         if wp.ndim != 3 or wp.shape[1:] != (self.num_layers, self.w_space_dim):
             raise ValueError(f'Input tensor should be with shape '
                              f'[batch_size, num_layers, w_space_dim], where '
@@ -488,17 +489,29 @@ class SynthesisModule(nn.Module):
                 block_idx = res_log2 - self.init_res_log2
                 if block_idx == 0:
                     if self.const_input:
-                        x, style = self.layer0(None, wp[:, 0], randomize_noise)
+                        x_before_styled, x, style = self.layer0(None, wp[:, 0], randomize_noise)
                     else:
                         x = wp[:, 0].view(-1, self.w_space_dim, 1, 1)
-                        x, style = self.layer0(x, wp[:, 0], randomize_noise)
+                        x_before_styled, x, style = self.layer0(x, wp[:, 0], randomize_noise)
                 else:
-                    x, style = self.__getattr__(f'layer{2 * block_idx}')(
-                        x, wp[:, 2 * block_idx])
+                    # first block
+                    if basecode_layer==f'x{2*block_idx:02d}':
+                        x_before_styled, x, style = self.__getattr__(f'layer{2 * block_idx}')(x, wp[:, 2 * block_idx], input_basecode=basecode)
+                    else:
+                        x_before_styled, x, style = self.__getattr__(f'layer{2 * block_idx}')(x, wp[:, 2 * block_idx])
+                results[f'x_before_styled{2 * block_idx:02d}'] = x_before_styled
+                results[f'x{2 * block_idx:02d}'] = x
                 results[f'style{2 * block_idx:02d}'] = style
-                x, style = self.__getattr__(f'layer{2 * block_idx + 1}')(
-                    x, wp[:, 2 * block_idx + 1])
+
+                # second block
+                if basecode_layer == f'x{2*block_idx+1:02d}':
+                    x_before_styled, x, style = self.__getattr__(f'layer{2 * block_idx + 1}')(x, wp[:, 2 * block_idx + 1], input_basecode=basecode)
+                else:
+                    x_before_styled, x, style = self.__getattr__(f'layer{2 * block_idx + 1}')(x, wp[:, 2 * block_idx + 1])
+                results[f'x_before_styled{2 * block_idx + 1:02d}'] = x_before_styled
+                results[f'x{2 * block_idx + 1:02d}'] = x
                 results[f'style{2 * block_idx + 1:02d}'] = style
+
             if current_lod - 1 < lod <= current_lod:
                 image = self.__getattr__(f'output{block_idx}')(x, None)
             elif current_lod < lod < current_lod + 1:
@@ -765,7 +778,8 @@ class ConvBlock(nn.Module):
                 torch.randn(*weight_shape) * wscale / lr_mul)
             self.wscale = lr_mul
 
-    def forward(self, x, w, randomize_noise=False):
+    def forward(self, x, w, randomize_noise=False,
+       			input_basecode=None):
         if self.position != 'const_init':
             x = self.upsample(x)
             weight = self.weight * self.wscale
@@ -800,9 +814,12 @@ class ConvBlock(nn.Module):
         if bias is not None:
             x = x + bias.view(1, -1, 1, 1)
         x = self.activate(x)
-        x = self.normalize(x)
-        x, style = self.style(x, w)
-        return x, style
+
+        if input_basecode is not None:
+            x = input_basecode
+        x_before_styled = self.normalize(x)
+        x, style = self.style(x_before_styled, w)
+        return x_before_styled, x, style
 
 
 class DenseBlock(nn.Module):
