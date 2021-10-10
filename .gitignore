@@ -10,7 +10,6 @@ __pycache__/
 /BDInvert/work_dirs/
 /BDInvert/test_imgs/
 *.jpg
-*.png
 *.jpeg
 *.gif
 *.avi
