@@ -54,7 +54,7 @@ def parse_args():
                              '`work_dirs/inversion/` by default. '
                              '(default: %(default)s)')
     parser.add_argument('--job_name', type=str, default='', help='Sub directory to save the results. If not specified, the result will be saved to {save_dir}/{model_name}')
-    parser.add_argument('--image_list', type=str, default='test_imgs/', help='target image folder path')
+    parser.add_argument('image_list', type=str, help='target image folder path')
     parser.add_argument('encoder_pt_path', type=str, default='', help='base code encoder path')
     parser.add_argument('--pnorm_root', type=str, default='pnorm/stylegan2_ffhq1024')
 

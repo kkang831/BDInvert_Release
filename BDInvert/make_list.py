@@ -9,9 +9,9 @@ parser.add_argument('--save_name', type=str, default='test.list', help='Save fil
 args = parser.parse_args()
 import glob
 image_list = []
-for filename in glob.glob(f'{args.image_list}/*.{args.file_type}'):
+for filename in glob.glob(f'{args.image_folder}/*.{args.file_type}'):
     image_list.append(os.path.basename(filename))
 
-with open(os.path.join(args.image_list,args.save_name), 'w') as f:
+with open(os.path.join(args.image_folder,args.save_name), 'w') as f:
     for item in image_list:
-        f.write(f"{os.path.join(args.image_list, item)}\n")
+        f.write(f"{os.path.join(args.image_folder, item)}\n")
