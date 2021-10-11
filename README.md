@@ -14,7 +14,26 @@ This repository contains the accompanying code for [GAN Inversion for Out-of-Ran
 pip install -r requirements.txt
 ```
 
+
+
 ## Usage
+
+### Train
+1. Change directory into BDInvert.
+```shell
+cd BDInvert
+```
+
+2. Train base code encoder.
+```shell
+python train_basecode_encoder.py
+```
+
+### Download pretrained base code encoder
+Download and unzip [pretrained weights](https://drive.google.com/file/d/1Gwi7I72vL7rdwET1Q0QnR71ZuZ0M3Jx1/view?usp=sharing) under `BDInvert/pretrained_models/`
+
+
+### Test
 1. Change directory into BDInvert.
 ```shell
 cd BDInvert
