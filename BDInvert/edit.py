@@ -51,9 +51,8 @@ def parse_args():
                              '(default: %(default)s)')
 
     # IO
-    parser.add_argument('inversion_dir', type=str, default='',
+    parser.add_argument('inversion_dir', type=str, default='', help='Latent head dir directory generated from invert.py')
     parser.add_argument('--gpu_id', type=int, default=0)
-                        help='Latent head dir directory generated from invert.py')
     parser.add_argument('--edit_direction', type=str, default='./editings/interfacegan_directions/age.pt')
     parser.add_argument('--start_distance', type=float, default=-2.0,
                         help='Start point for manipulation on each semantic. '
@@ -130,6 +129,8 @@ def main():
     print('basecode_layer : ', basecode_layer)
 
     # Prepare codes.
+    print('pppppppppp')
+    print(generator.w_space_dim)
     detailcodes = np.empty((0, generator.num_layers, generator.w_space_dim))
     if args.use_FW_space:
         basecodes = np.empty((0, 512, args.basecode_spatial_size, args.basecode_spatial_size))
@@ -166,7 +167,7 @@ def main():
 
             if args.use_FW_space:
                 image = generator.synthesis(temp_code, randomize_noise=args.randomize_noise,
-                                            basecode_layer=args.basecode_layer, basecode=basecode)['image']
+                                            basecode_layer=basecode_layer, basecode=basecode)['image']
             else:
                 image = generator.synthesis(temp_code, randomize_noise=args.randomize_noise)['image']
 
