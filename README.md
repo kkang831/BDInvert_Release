@@ -37,7 +37,8 @@ python pca_p_space.py
 ### Download pretrained base code encoder
 Download and unzip [pretrained weights](https://drive.google.com/file/d/1Gwi7I72vL7rdwET1Q0QnR71ZuZ0M3Jx1/view?usp=sharing) under `BDInvert/pretrained_models/`
 
-### Test (Default test setting use StyleGAN2 pretrained on FFHQ1024 and use basecode spatial size as 16x16.)
+### Test
+* Default test setting use StyleGAN2 pretrained on FFHQ1024 and use basecode spatial size as 16x16.
 1. Change directory into BDInvert.
 ```shell
 cd BDInvert
@@ -70,7 +71,5 @@ Any exemptions to these terms requires a license from the Pohang University of S
 
 ## Acknowledgments
 **NOTE**
-
-Our implementation is heavily based on the ["GenForce Library"](https://github.com/genforce/genforce)
-
-Interface GAN editing vectors are from ["encoder4editing"](https://github.com/omertov/encoder4editing)
+* Our implementation is heavily based on the ["GenForce Library"](https://github.com/genforce/genforce)
+* Interface GAN editing vectors are from ["encoder4editing"](https://github.com/omertov/encoder4editing)
