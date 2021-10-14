@@ -59,8 +59,8 @@ def parse_args():
     parser.add_argument('--pnorm_root', type=str, default='pnorm/stylegan2_ffhq1024')
 
     # Settings
-    parser.add_argument('--basecode_layer', type=str, default='x03', help=f'x00~x17 for StyleGAN1 (x02, x04), \
-                                                                            x00~x17 for StyleGAN2 (x01, x03), \
+    parser.add_argument('--basecode_layer', type=str, default='x03', help=f'x00~x17 for StyleGAN1 (x02, x04 mean 8x8, 16x16 size of basecode spatial size, respectively.) \
+                                                                            x00~x17 for StyleGAN2 (x01, x03 mean 8x8, 16,16 size of basecode spatial size, respectively.) \
                                                                             indent means not using embedding layer')
     parser.add_argument('--encoder_cfg', type=str, default='default')
 

@@ -67,9 +67,9 @@ def parse_args():
 
     # Settings
     parser.add_argument('--use_FW_space', type=bool_parser, default=True)
-    parser.add_argument('--basecode_layer', type=str, default='x03', help=f'x00~x17 for StyleGAN1 (x02, x04), \
-                                                                          x00~x.. for StyleGAN2 (x01, x03), \
-                                                                          indent means not using embedding layer')
+    parser.add_argument('--basecode_layer', type=str, default='x03', help=f'x00~x17 for StyleGAN1 (x02, x04 mean 8x8, 16x16 size of basecode spatial size, respectively.) \
+                                                                            x00~x17 for StyleGAN2 (x01, x03 mean 8x8, 16,16 size of basecode spatial size, respectively.) \
+                                                                            indent means not using embedding layer')
     return parser.parse_args()
 
 
@@ -125,7 +125,7 @@ def main():
     print(f'Loading images and corresponding inverted latent codes.')
 
     detailcodes = np.empty((0, 18, 512))
-    if args.use_FW_space: 
+    if args.use_FW_space:
         if args.basecode_layer == "x01":
             basecodes = np.empty((0, 512, 8, 8))
         elif args.basecode_layer == "x03":
