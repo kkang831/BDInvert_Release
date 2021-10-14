@@ -58,12 +58,12 @@ def parse_args():
     parser.add_argument('--job_name', type=str, default='', help='Sub directory to save the results. If not specified, the result will be saved to {save_dir}/{model_name}')
 
     parser.add_argument('--encoder_cfg', type=str, default='default')
-    parser.add_argument('--batch_num', type=int, default=16, help='Number of samples to synthesize. ''(default: %(default)s)')
-    parser.add_argument('--epoch_num', type=int, default=10000, help='Number of samples to synthesize. ''(default: %(default)s)')
+    parser.add_argument('--batch_num', type=int, default=16, help='Batch size. ''(default: %(default)s)')
+    parser.add_argument('--epoch_num', type=int, default=10000, help='Number of epoch. ''(default: %(default)s)')
 
     parser.add_argument('--perceptual_weight', type=float, default=10.)
     parser.add_argument('--initial_lr', type=float, default=1e-3)
-    parser.add_argument('--basecode_spatial_size', type=int, default=16, help='spatial resolution of basecode')
+    parser.add_argument('--basecode_spatial_size', type=int, default=16, help='spatial resolution of basecode. ''(default: %(default)s)'')
     return parser.parse_args()
 
 
@@ -132,7 +132,7 @@ def main():
     lpips_fn.net.requires_grad_(False)
 
     # Get GAN type
-    gan_type = parse_gan_type(generator) # stylegan or stylegan2
+    stylegan_type = parse_gan_type(generator) # stylegan or stylegan2
 
     #
     basecode_layer = int(np.log2(args.basecode_spatial_size) - 2) * 2

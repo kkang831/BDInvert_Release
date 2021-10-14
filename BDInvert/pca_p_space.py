@@ -49,11 +49,10 @@ def parse_args():
     # IO
     parser.add_argument('--gpu_id', type=int, default=0)
     parser.add_argument('--save_dir', type=str, default='',
-                        help='Directory to save the results. If not specified, '
-                             'the results will be saved to '
-                             '`pnorm` by default. '
+                        help='Root directory to save the results. If not specified, '
+                             'the results will be saved to `pnorm/` by default. '
                              '(default: %(default)s)')
-    parser.add_argument('--job_name', type=str, default='')
+    parser.add_argument('--job_name', type=str, default='', help='Sub directory to save the results. If not specified, the result will be saved to {save_dir}/{model_name}')
 
     # Settings
     parser.add_argument('--total_samples_num', type=int, default=1000000, help='Number of random samples')
@@ -121,10 +120,6 @@ def main():
     generator.requires_grad_(False)
     print(f'Finish loading StyleGAN checkpoint.')
 
-    # Get GAN type
-    gan_type = parse_gan_type(generator) # stylegan or stylegan2
-
-
     total_samples_num = args.total_samples_num
     batch_num = args.batch_num
 
@@ -151,7 +146,6 @@ def main():
     #####################################
     # Testbed
     #####################################
-
     latents = torch.empty((0, generator.z_space_dim), dtype=torch.float32).cuda()
     for _ in range(total_samples_num//batch_num):
         z = torch.randn(batch_num, generator.z_space_dim).cuda()

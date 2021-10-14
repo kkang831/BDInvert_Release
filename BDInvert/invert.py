@@ -18,6 +18,7 @@ from glob import glob
 
 from models import MODEL_ZOO
 from models import build_generator
+from models import parse_gan_type
 from utils.misc import bool_parser
 
 from image_tools import preprocess, postprocess, Lanczos_resizing
@@ -54,14 +55,12 @@ def parse_args():
                              '`work_dirs/inversion/` by default. '
                              '(default: %(default)s)')
     parser.add_argument('--job_name', type=str, default='', help='Sub directory to save the results. If not specified, the result will be saved to {save_dir}/{model_name}')
-    parser.add_argument('image_list', type=str, help='target image folder path')
-    parser.add_argument('encoder_pt_path', type=str, default='', help='base code encoder path')
+    parser.add_argument('--image_list', type=str, help='target image folder path')
+    parser.add_argument('--encoder_pt_path', type=str, default='', help='base code encoder path')
     parser.add_argument('--pnorm_root', type=str, default='pnorm/stylegan2_ffhq1024')
 
     # Settings
-    parser.add_argument('--basecode_layer', type=str, default='x03', help=f'x00~x17 for StyleGAN1 (x02, x04 mean 8x8, 16x16 size of basecode spatial size, respectively.) \
-                                                                            x00~x17 for StyleGAN2 (x01, x03 mean 8x8, 16,16 size of basecode spatial size, respectively.) \
-                                                                            indent means not using embedding layer')
+    parser.add_argument('--basecode_spatial_size', type=int, default=16, help='spatial resolution of basecode.')
     parser.add_argument('--encoder_cfg', type=str, default='default')
 
     # Hyperparameter
@@ -146,20 +145,29 @@ def main():
     lpips_fn = lpips.LPIPS(net='vgg').cuda()
     lpips_fn.net.requires_grad_(False)
 
-    # Define layers used for base code
-    if args.basecode_layer == '':
-        basecode_layer = None # means not using basecode
-    else:
-        basecode_layer = args.basecode_layer
 
-    #
+    # Get GAN type
+    stylegan_type = parse_gan_type(generator) # stylegan or stylegan2
+
+    # Define layers used for base code
+    basecode_layer = int(np.log2(args.basecode_spatial_size) - 2) * 2
+    if stylegan_type == 'stylegan2':
+        basecode_layer = f'x{basecode_layer-1:02d}'
+    elif stylegan_type == 'stylegan':
+        basecode_layer = f'x{basecode_layer:02d}'
+    print('basecode_layer : ', basecode_layer)
+
+
     with torch.no_grad():
         z = torch.randn(1, generator.z_space_dim).cuda()
         w = generator.mapping(z, label=None)['w']
         wp = generator.truncation(w, trunc_psi=args.trunc_psi, trunc_layers=args.trunc_layers)
         basecode = generator.synthesis(wp, randomize_noise=args.randomize_noise)[basecode_layer]
+
     encoder_input_shape = [3, basecode.shape[2]*8, basecode.shape[3]*8]
     encoder_output_shape = basecode.shape[1:]
+    print(f'Encoder input shape  = {encoder_input_shape}')
+    print(f'Encoder output shape = {encoder_output_shape}')
 
     # Define Encoder
     basecode_encoder = encoder_simple(encoder_input_shape=encoder_input_shape,
@@ -193,7 +201,7 @@ def main():
 
         image = cv2.imread(image_path)
         image_target = torch.from_numpy(preprocess(image[np.newaxis, :], channel_order='BGR')).cuda() # torch_tensor, -1~1, RGB, BCHW
-        image_target = Lanczos_resizing(image_target, (1024,1024))
+        image_target = Lanczos_resizing(image_target, (generator.resolution,generator.resolution))
         image_target_resized = Lanczos_resizing(image_target, (256,256))
 
         target = image_target.clone()
@@ -203,7 +211,7 @@ def main():
         # Generate starting detail codes
         detailcode_starting = generator.truncation.w_avg.clone().detach()
         detailcode_starting = detailcode_starting.view(1, 1, -1)
-        detailcode_starting = detailcode_starting.repeat(1, 18, 1)
+        detailcode_starting = detailcode_starting.repeat(1, generator.num_layers, 1)
         detailcode = detailcode_starting.clone()
         detailcode.requires_grad_(True)
 

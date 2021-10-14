@@ -51,8 +51,8 @@ def parse_args():
                              '(default: %(default)s)')
 
     # IO
-    parser.add_argument('--gpu_id', type=int, default=0)
     parser.add_argument('inversion_dir', type=str, default='',
+    parser.add_argument('--gpu_id', type=int, default=0)
                         help='Latent head dir directory generated from invert.py')
     parser.add_argument('--edit_direction', type=str, default='./editings/interfacegan_directions/age.pt')
     parser.add_argument('--start_distance', type=float, default=-2.0,
@@ -67,9 +67,7 @@ def parse_args():
 
     # Settings
     parser.add_argument('--use_FW_space', type=bool_parser, default=True)
-    parser.add_argument('--basecode_layer', type=str, default='x03', help=f'x00~x17 for StyleGAN1 (x02, x04 mean 8x8, 16x16 size of basecode spatial size, respectively.) \
-                                                                            x00~x17 for StyleGAN2 (x01, x03 mean 8x8, 16,16 size of basecode spatial size, respectively.) \
-                                                                            indent means not using embedding layer')
+    parser.add_argument('--basecode_spatial_size', type=int, default=16, help='spatial resolution of basecode.')
     return parser.parse_args()
 
 
@@ -115,21 +113,26 @@ def main():
     generator.requires_grad_(False)
     print(f'Finish loading StyleGAN checkpoint.')
 
-    gan_type = parse_gan_type(generator)
-
+    # Load edit direction
     direction = torch.load(args.edit_direction).cuda() # 1, 512
     def edit_code(codes, direction, weight=3):
             return codes + weight * direction
 
-    # Prepare codes.
-    print(f'Loading images and corresponding inverted latent codes.')
+    # Get GAN type
+    stylegan_type = parse_gan_type(generator) # stylegan or stylegan2
 
-    detailcodes = np.empty((0, 18, 512))
+    # Define layers used for base code
+    basecode_layer = int(np.log2(args.basecode_spatial_size) - 2) * 2
+    if stylegan_type == 'stylegan2':
+        basecode_layer = f'x{basecode_layer-1:02d}'
+    elif stylegan_type == 'stylegan':
+        basecode_layer = f'x{basecode_layer:02d}'
+    print('basecode_layer : ', basecode_layer)
+
+    # Prepare codes.
+    detailcodes = np.empty((0, generator.num_layers, generator.w_space_dim))
     if args.use_FW_space:
-        if args.basecode_layer == "x01":
-            basecodes = np.empty((0, 512, 8, 8))
-        elif args.basecode_layer == "x03":
-            basecodes = np.empty((0,512,16,16))
+        basecodes = np.empty((0, 512, args.basecode_spatial_size, args.basecode_spatial_size))
 
     inversion_dir = args.inversion_dir
     print('inversion_dir : ', inversion_dir)
