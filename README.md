@@ -60,7 +60,7 @@ python make_list.py --image_folder ./test_img
 python invert.py --encoder_pt_path {encoder_pt_path}
 ```
 - `--image_list` : Inversion target image list generated from above step 2. Default is ./test_img/test.list
-- `--weight_pnorm_term` : As recently well known, there is a trade-off between editing quality and reconstruction quality. This argument control this trade-off.
+- `--weight_pnorm_term` : As recently well known, there is a trade-off between editing quality and reconstruction quality. This argument controls this trade-off.
 
 4. Edit embedded results.
 ```shell
