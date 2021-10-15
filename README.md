@@ -35,7 +35,13 @@ python pca_p_space.py
 ```
 
 ### Download pretrained base code encoder
-Download and unzip [pretrained weights](https://drive.google.com/file/d/1Gwi7I72vL7rdwET1Q0QnR71ZuZ0M3Jx1/view?usp=sharing) under `BDInvert/pretrained_models/`
+Download and unzip  under `BDInvert/pretrained_models/`
+
+| Encoder Pretrained Models                   | Basc Code Spatial Size |
+| :--                                         | :--    |
+| [StyleGAN2 pretrained on FFHQ 1024, 8x8] (https://drive.google.com/file/d/1H4vyPdXJdv-fkGQPLAK6OoF8WKLBtrPY/view?usp=sharing)     | 8x8
+| [StyleGAN2 pretrained on FFHQ 1024, 16x16](https://drive.google.com/file/d/1Gwi7I72vL7rdwET1Q0QnR71ZuZ0M3Jx1/view?usp=sharing)    | 16x16
+
 
 ### Test
 * Default test setting use StyleGAN2 pretrained on FFHQ1024 and use basecode spatial size as 16x16.
@@ -51,8 +57,10 @@ python make_list.py --image_folder ./test_img
 
 3. Embed images into StyleGAN's latent codes.
 ```shell
-python invert.py --image_list ./test_img/test.list --encoder_pt_path {encoder_pt_path}
+python invert.py --encoder_pt_path {encoder_pt_path}
 ```
+- `--image_list` : Inversion target image list generated from above step 2. Default is ./test_img/test.list
+- `--weight_pnorm_term` : As recently well known, there is a trade-off between editing quality and reconstruction quality. This argument control this trade-off.
 
 4. Edit embedded results.
 ```shell
