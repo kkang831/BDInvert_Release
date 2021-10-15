@@ -129,8 +129,6 @@ def main():
     print('basecode_layer : ', basecode_layer)
 
     # Prepare codes.
-    print('pppppppppp')
-    print(generator.w_space_dim)
     detailcodes = np.empty((0, generator.num_layers, generator.w_space_dim))
     if args.use_FW_space:
         basecodes = np.empty((0, 512, args.basecode_spatial_size, args.basecode_spatial_size))

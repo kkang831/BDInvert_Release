@@ -39,7 +39,6 @@ Download and unzip  under `BDInvert/pretrained_models/`
 
 | Encoder Pretrained Models                   | Basc Code Spatial Size |
 | :--                                         | :--    |
-| [StyleGAN2 pretrained on FFHQ 1024, 8x8](https://drive.google.com/file/d/1H4vyPdXJdv-fkGQPLAK6OoF8WKLBtrPY/view?usp=sharing)     | 8x8
 | [StyleGAN2 pretrained on FFHQ 1024, 16x16](https://drive.google.com/file/d/1Gwi7I72vL7rdwET1Q0QnR71ZuZ0M3Jx1/view?usp=sharing)    | 16x16
 
 
