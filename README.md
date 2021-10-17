@@ -34,8 +34,8 @@ python train_basecode_encoder.py
 python pca_p_space.py
 ```
 
-### Download pretrained base code encoder
-Download and unzip  under `BDInvert/pretrained_models/`
+### Download pretrained base code encoder.
+Download and unzip  under `BDInvert/pretrained_models/`.
 
 | Encoder Pretrained Models                   | Basc Code Spatial Size |
 | :--                                         | :--    |
@@ -78,5 +78,5 @@ Any exemptions to these terms requires a license from the Pohang University of S
 
 ## Acknowledgments
 **NOTE**
-* Our implementation is heavily based on the ["GenForce Library"](https://github.com/genforce/genforce)
-* Interface GAN editing vectors are from ["encoder4editing"](https://github.com/omertov/encoder4editing)
+* Our implementation is heavily based on the ["GenForce Library"](https://github.com/genforce/genforce).
+* Interface GAN editing vectors are from ["encoder4editing"](https://github.com/omertov/encoder4editing).
