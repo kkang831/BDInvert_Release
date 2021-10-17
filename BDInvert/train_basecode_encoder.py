@@ -63,7 +63,7 @@ def parse_args():
 
     parser.add_argument('--perceptual_weight', type=float, default=10.)
     parser.add_argument('--initial_lr', type=float, default=1e-3)
-    parser.add_argument('--basecode_spatial_size', type=int, default=16, help='spatial resolution of basecode. ''(default: %(default)s)'')
+    parser.add_argument('--basecode_spatial_size', type=int, default=16, help='spatial resolution of basecode. ''(default: %(default)s)')
     return parser.parse_args()
 
 
