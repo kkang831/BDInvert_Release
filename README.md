@@ -67,6 +67,10 @@ python edit.py {inversion directory}
 ```
 - `--edit_direction` : You can change edit direction, which located at BDInvert/editings/interfacegan_directions
 
+## Small changes
+* We changed the detail code regularization method from hard clipping in P-norm+ space to L2 norm regularization, following the update of the [original paper](https://arxiv.org/pdf/2012.09036.pdf).
+* Due to this change, new hyperparameter, `weight_pnorm_term`, has been added.
+
 ## License
 This software is being made available under the terms in the [LICENSE](LICENSE) file.
 
