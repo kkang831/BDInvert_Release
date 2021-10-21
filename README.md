@@ -1,4 +1,4 @@
-# BDInvert
+# BDInvert: GAN Inversion for Out-of-Range Images with Geometric Transformations
 
 This repository contains the accompanying code for [GAN Inversion for Out-of-Range Images with Geometric Transformations, ICCV 2021](https://kkang831.github.io/publication/ICCV_2021_BDInvert/)
 <p align="center"><img src = "./Teaser.png" height ="500" />
